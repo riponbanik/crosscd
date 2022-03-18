@@ -1,0 +1,91 @@
+# apiVersion: workload.crossplane.io/v1alpha1
+# kind: KubernetesApplication
+# metadata:
+#   name: wordpress-sydney
+#   labels:
+#     app: wordpress-sydney
+# spec:
+#   resourceSelector:
+#     matchLabels:
+#       app: wordpress-sydney
+#   targetSelector:
+#     matchLabels:
+#       app: wordpress-sydney
+#   resourceTemplates:
+#     - metadata:
+#         name: wordpress-sydney-namespace
+#         labels:
+#           app: wordpress-sydney
+#       spec:
+#         template:
+#           apiVersion: v1
+#           kind: Namespace
+#           metadata:
+#             name: wordpress
+#             labels:
+#               app: wordpress
+#     - metadata:
+#         name: wordpress-sydney-deployment
+#         labels:
+#           app: wordpress-sydney
+#       spec:
+#         secrets:
+#           - name: sql-sydney
+#         template:
+#           apiVersion: apps/v1
+#           kind: Deployment
+#           metadata:
+#             namespace: wordpress
+#             name: wordpress
+#             labels:
+#               app: wordpress
+#           spec:
+#             selector:
+#               matchLabels:
+#                 app: wordpress
+#             template:
+#               metadata:
+#                 labels:
+#                   app: wordpress
+#               spec:
+#                 containers:
+#                   - name: wordpress
+#                     image: wordpress:4.6.1-apache
+#                     env:
+#                       - name: WORDPRESS_DB_HOST
+#                         valueFrom:
+#                           secretKeyRef:
+#                             name: wordpress-sydney-deployment-sql-sydney
+#                             key: endpoint
+#                       - name: WORDPRESS_DB_USER
+#                         valueFrom:
+#                           secretKeyRef:
+#                             name: wordpress-sydney-deployment-sql-sydney
+#                             key: username
+#                       - name: WORDPRESS_DB_PASSWORD
+#                         valueFrom:
+#                           secretKeyRef:
+#                             name: wordpress-sydney-deployment-sql-sydney
+#                             key: password
+#                     ports:
+#                       - containerPort: 80
+#                         name: wordpress
+#     - metadata:
+#         name: wordpress-sydney-service
+#         labels:
+#           app: wordpress-sydney
+#       spec:
+#         template:
+#           apiVersion: v1
+#           kind: Service
+#           metadata:
+#             namespace: wordpress
+#             name: wordpress
+#             labels:
+#               app: wordpress
+#           spec:
+#             ports:
+#               - port: 80
+#             selector:
+#               app: wordpress
+#             type: LoadBalancer

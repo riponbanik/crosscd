@@ -1,0 +1,11 @@
+apiVersion: database.crossplane.io/v1alpha1
+kind: MySQLInstance
+metadata:
+  name: sql-sydney
+spec:
+  classSelector:
+    matchLabels:
+      region:  ap-southeast-2
+  engineVersion: "5.7"
+  writeConnectionSecretToRef:
+    name: sql-sydney
